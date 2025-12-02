@@ -6,8 +6,9 @@ class DatabaseMethods {
     let connection;
     try {
       connection = await connect();
-      const [rows] = await connection.execute<RowDataPacket[]>(sql.query, sql.params);
-      const result = rows[0] || null;
+      // CORRECCIÓN: Quitamos <RowDataPacket[]> y usamos (rows as any)
+      const [rows] = await connection.execute(sql.query, sql.params);
+      const result = (rows as any)[0] || null;
       return { error: false, msg: result };
     } catch (error) {
       return { error: true, msg: 'error_query_one' };
@@ -20,7 +21,8 @@ class DatabaseMethods {
     let connection;
     try {
       connection = await connect();
-      const [rows] = await connection.execute<RowDataPacket[]>(sql.query, sql.params);
+      // CORRECCIÓN: Quitamos <RowDataPacket[]>
+      const [rows] = await connection.execute(sql.query, sql.params);
       return { error: false, msg: rows };
     } catch (error) {
       return { error: true, msg: 'error_query' };
@@ -33,7 +35,8 @@ class DatabaseMethods {
     let connection;
     try {
       connection = await connect();
-      const [rows] = await connection.execute<RowDataPacket[]>(sql.query, sql.params);
+      // CORRECCIÓN: Quitamos <RowDataPacket[]>
+      const [rows] = await connection.execute(sql.query, sql.params);
       return { error: false, msg: rows };
     } catch (error) {
       return { error: true, msg: 'error_query' };
