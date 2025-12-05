@@ -5,7 +5,7 @@ import { RowDataPacket } from 'mysql2';
 
 class MenuService {
     static async viewIngredients() {
-        // CORRECCIÓN: Aquí agregamos 'p.image' para que la base de datos nos devuelva la foto
+        // 1. Traer todos los productos (Hamburguesas, Snacks, etc.)
         const res = await DatabaseMethods.query({
             query: "SELECT p.idproducts, p.name, p.image, p.price, p.description, p.category_idcategory, c.name as name_category FROM products as p JOIN category c ON c.idcategory = p.category_idcategory WHERE p.active = 1 ORDER BY p.category_idcategory, p.name",
             params: []
@@ -18,13 +18,21 @@ class MenuService {
             throw new CustomExceptions('004');
         }
 
+        // 2. Traer los ingredientes de cada producto
         for (const [key, value] of Object.entries(msj)) {
             const res2 = await DatabaseMethods.query({
                 query: `
-                    SELECT i.idingredients, i.name, i.extra, i.cost, i.stock, i.required 
+                    SELECT 
+                        i.idingredients, 
+                        i.name, 
+                        i.extra, 
+                        i.cost, 
+                        i.stock, 
+                        i.required,
+                        CONCAT(i.name, '.png') as image  -- <--- TRUCO: Generamos el nombre de la imagen aquí
                     FROM products_ingredients pi 
                     JOIN ingredients i ON i.idingredients = pi.ingredients_idingredients 
-                    WHERE pi.products_idProducts = ? 
+                    WHERE pi.products_idproducts = ?  -- <--- CORRECCIÓN: todo en minúsculas para Linux
                     ORDER BY i.name`,
                 params: [(value as any).idproducts]
             });

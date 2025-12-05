@@ -20,53 +20,59 @@ class UserController {
       }
     }
   }
+
   static async viewUsers(req: any, res: any) {
     const result = await UserModel.viewUsers();
     res.json(result);
   }
+
   static async viewUser(req: any, res: any) {
     const keyParams = req.query.params;
     let params;
-    params = JSON.parse(keyParams);
+    try {
+        params = JSON.parse(keyParams);
+    } catch (e) {
+        throw new CustomExceptions('007');
+    }
 
     const { idusers } = params;
     if (Utils.hasEmptyParams([idusers])) throw new CustomExceptions('007');
     const result = await UserModel.viewUser(idusers);
     res.json(result);
   }
-  static async updateUser(req:any, res:any){
-    const keyParams = req.query.params;
-    let params;
-    params = JSON.parse(keyParams);
+
+  static async updateUser(req: any, res: any) {
+    // Manejo robusto de parámetros (Angular a veces manda body directo en PUT)
+    let params = req.query.params ? JSON.parse(req.query.params) : req.body;
     
-    const {idusers,name,password,phone,rol} = params;
-    if (Utils.hasEmptyParams([idusers,name,password,phone,rol]))
+    const { idusers, name, password, phone, rol } = params;
+    if (Utils.hasEmptyParams([idusers, name, password, phone, rol]))
         throw new CustomExceptions("007");
   
-      const result = await UserModel.updateUser(
-        idusers,
-        name,
-        password,
-        phone,
-        rol
-      );
-  
-      res.json(result);
+    const result = await UserModel.updateUser(idusers, name, password, phone, rol);
+    res.json(result);
   }
-  static async deleteUser(req:any, res:any){
-    const keyParams = req.query.params;
-    let params;
-    params = JSON.parse(keyParams);
+
+  // --- NUEVO: Actualizar Perfil (Cliente) ---
+  static async updateProfile(req: any, res: any) {
+    const { idusers, name, password, phone } = req.body;
     
-    const {idusers} = params;
-    if (Utils.hasEmptyParams([idusers]))
+    // Solo validamos ID y Nombre. El password es opcional.
+    if (Utils.hasEmptyParams([idusers, name]))
         throw new CustomExceptions("007");
   
-      const result = await UserModel.deleteUser(
-        idusers
-      );
+    const result = await UserModel.updateProfile(idusers, name, password, phone);
+    res.json(result);
+  }
+
+  static async deleteUser(req: any, res: any) {
+    let params = req.query.params ? JSON.parse(req.query.params) : req.body;
+    
+    const { idusers } = params;
+    if (Utils.hasEmptyParams([idusers])) throw new CustomExceptions("007");
   
-      res.json(result);
+    const result = await UserModel.deleteUser(idusers);
+    res.json(result);
   }
 }
 export { UserController };
