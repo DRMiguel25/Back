@@ -93,5 +93,22 @@ class GraphicsModel{
     static async avgTime(){
         return await GraphicsService.avgTime();
     }
+    static async clientTopProducts(userId: string){
+        const res = await GraphicsService.clientTopProducts(userId);
+        if (res.error) return res;
+        
+        const msj = res.msg;
+        if (typeof msj === 'string') throw new CustomExceptions('004');
+        
+        let labels: string[] = [];
+        let data: number[] = [];
+        
+        (msj as any[]).forEach((element: any) => {
+            labels.push(element.producto);
+            data.push(Number(element.cantidad));
+        });
+        
+        return { error: false, msg: { labels, data } };
+    }
 }
 export {GraphicsModel};

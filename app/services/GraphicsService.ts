@@ -34,5 +34,21 @@ class GraphicsService{
             params: []
         })
     }
+    static async clientTopProducts(userId: string){
+        return await DatabaseMethods.query({
+            query: `SELECT p.name AS producto, SUM(od.amount) AS cantidad, c.name AS categoria 
+                    FROM order_details od 
+                    INNER JOIN products p ON p.idproducts = od.products_idproducts 
+                    INNER JOIN \`order\` o ON o.idorder = od.order_idorder 
+                    JOIN category c ON p.category_idcategory = c.idcategory 
+                    WHERE o.users_idusers = ? 
+                    AND MONTH(o.date) = MONTH(NOW()) 
+                    AND YEAR(o.date) = YEAR(NOW()) 
+                    GROUP BY p.name, c.name 
+                    ORDER BY cantidad DESC 
+                    LIMIT 5`,
+            params: [userId]
+        });
+    }
 }
 export {GraphicsService};

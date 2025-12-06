@@ -9,5 +9,6 @@ router.get('/bestSeller',Middleware(1), GraphicsController.bestSeller);
 router.get('/bestClient',Middleware(1), GraphicsController.bestClient);
 router.get('/sales',Middleware(1), GraphicsController.sales);
 router.get('/avgTime',Middleware(1), GraphicsController.avgTime);
+router.get('/clientTopProducts', Middleware(1), GraphicsController.clientTopProducts);
 
 export default router;

@@ -29,5 +29,13 @@ class GraphicsController {
     const result = await GraphicsModel.avgTime();
     res.json(result);
   }
+  static async clientTopProducts(req: any, res: any) {
+    const keyParams = req.query.params;
+    let params = JSON.parse(keyParams);
+    const { userId } = params;
+    if (Utils.hasEmptyParams([userId])) throw new CustomExceptions("007");
+    const result = await GraphicsModel.clientTopProducts(userId);
+    res.json(result);
+  }
 }
 export { GraphicsController };
